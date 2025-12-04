@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XENOJELLY ARCHIVE — a speculative trans-oceanic fabulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* === BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            background: #000;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        /* === INTRO SCREEN === */
+        #intro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #000814 0%, #001d3d 50%, #000814 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffd60a;
+            z-index: 1000;
+            transition: opacity 2s;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        #intro.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        #intro h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+        
+        #intro p {
+            font-size: 1.2em;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #90e0ef;
+        }
+        
+        #intro .controls-preview {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #0077b6;
+            max-width: 500px;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        #intro .controls-preview strong {
+            color: #ffd60a;
+        }
+        
+        #intro .controls-preview span {
+            font-size: 0.85em;
+            color: #90e0ef;
+            line-height: 1.8;
+        }
+        
+        #intro button {
+            background: transparent;
+            border: 2px solid #ffd60a;
+            color: #ffd60a;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        #intro button:hover {
+            background: #ffd60a;
+            color: #000;
+        }
+        
+        /* === INFO PANEL (controls) === */
+        #info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #90e0ef;
+            font-size: 0.9em;
+            max-width: 400px;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-left: 3px solid #0077b6;
+            opacity: 0.8;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        #info.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+        
+        #toggle-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 119, 182, 0.8);
+            border: 1px solid #0077b6;
+            color: #90e0ef;
+            padding: 8px 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            cursor: pointer;
+            z-index: 11;
+            transition: all 0.3s;
+        }
+        
+        #toggle-info:hover {
+            background: rgba(0, 119, 182, 1);
+            color: #ffd60a;
+        }
+        
+        /* === HOVER TEXT TOOLTIP === */
+        #hover-text {
+            position: absolute;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.9);
+            color: #ffd60a;
+            padding: 15px;
+            border: 1px solid #0077b6;
+            font-size: 0.95em;
+            max-width: 350px;
+            line-height: 1.5;
+            display: none;
+            z-index: 100;
+        }
+
+        /* === AMBIENT WHISPERS (background text) === */
+        .whisper {
+            position: absolute;
+            pointer-events: none;
+            font-size: 0.8em;
+            color: #90e0ef;
+            opacity: 0.15;
+            text-shadow: 0 0 6px rgba(0, 224, 255, 0.6);
+            white-space: nowrap;
+            z-index: 5;
+        }
+
+        /* === QUOTE FRAGMENTS (for events) === */
+        .quote-fragment {
+            position: absolute;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            max-width: 420px;
+            line-height: 1.5;
+            z-index: 50;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+        }
+
+        .quote-fragment.archival {
+            font-size: 0.8em;
+            color: #90e0ef;
+            opacity: 0.85;
+        }
+
+        .quote-fragment.fabulated {
+            font-size: 0.85em;
+            color: #ffd60a;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- INTRO SCREEN -->
+    <div id="intro">
+        <h1>XENOJELLY ARCHIVE</h1>
+        <p>Enter el otro lado — the shifting border zone</p>
+        <p style="font-size: 0.9em; color: #0077b6;">
+            A speculative trans-oceanic archive that refuses legibility, 
+            classification, and containment. Here, records are jellyfish-like entities 
+            that pulse, mutate, glitch, and leak. This is nepantla: the in-between space 
+            where bodies deemed alien, impossible, or fugitive fabulate new futures.
+        </p>
+        
+        <div class="controls-preview">
+            <strong>NAVIGATION:</strong><br>
+            <span>
+            • Hover over jellyfish to glimpse fabulated fragments<br>
+            • Click to split or transform entities<br>
+            • Drag to orbit your perspective<br>
+            • Arrow keys ↑↓: rise or descend through the field<br>
+            • Arrow keys ←→: rotate left/right<br>
+            • W/S keys: zoom in/out<br>
+            • Press [H] to hide/show controls once inside
+            </span>
+        </div>
+        
+        <button onclick="enterArchive()">ENTER THE BORDERLAND OCEAN</button>
+    </div>
+    
+    <!-- TOGGLE BUTTON FOR CONTROLS -->
+    <button id="toggle-info" onclick="toggleInfo()">HIDE CONTROLS [H]</button>
+    
+    <!-- HOVER TOOLTIP (displays when hovering over jellyfish) -->
+    <div id="hover-text"></div>
+    
+    <!-- INFO PANEL (navigation controls) -->
+    <div id="info">
+        <strong>NAVIGATION:</strong><br>
+        • Hover over jellyfish to glimpse fabulated fragments<br>
+        • Click to split or transform entities<br>
+        • Drag to orbit your perspective through the borderland ocean<br>
+        • Arrow keys ↑ / ↓: rise or descend your gaze through the jellyfish field<br>
+        • Arrow keys ← / →: rotate left/right around the archive<br>
+        • W / S keys: move inward/outward (zoom through the swarm)<br>
+        • Press [H] to hide/show these controls<br>
+    </div>
+
+    <!-- AUDIO ELEMENTS -->
+    <audio id="ambient-sound" src="ambient-underwater.mp3" loop></audio>
+    <audio id="split-sound" src="jelly-split.mp3"></audio>
+    <audio id="transform-sound" src="jelly-transform.mp3"></audio>
+    <audio id="whale-sound" src="whale.mp3"></audio>
+
+    <script>
+        // === INITIALIZATION & ERROR HANDLING ===
+        console.log("XENOJELLY: script loaded.");
+
+        window.onerror = function (msg, url, line, col, error) {
+            console.error("🔥 SCRIPT ERROR:", msg, "on line", line + ":" + col);
+        };
+
+        // === UI STATE ===
+        let infoVisible = true;
+
+        // Toggle visibility of control panel
+        function toggleInfo() {
+            const info = document.getElementById('info');
+            const button = document.getElementById('toggle-info');
+            infoVisible = !infoVisible;
+            
+            if (infoVisible) {
+                info.classList.remove('hidden');
+                button.textContent = 'HIDE CONTROLS [H]';
+            } else {
+                info.classList.add('hidden');
+                button.textContent = 'SHOW CONTROLS [H]';
+            }
+        }
+
+        // === TEXT FRAGMENTS (displayed on hover) ===
+        // These are quotes/paraphrases from course readings that appear when hovering over jellyfish
+        const fragments = [
+            // BROLASKI (my voice was too obvious)
+            { text: "my voice was too obvious", author: "brolaski", theme: "glitch" },
+            { text: "jellyfish undulate / grinding on kelp", author: "brolaski", theme: "oceanic" },
+            { text: "slip thru the fishing nets easy as pie", author: "brolaski", theme: "escape" },
+            { text: "the seas are lousy w/ them jellyfish", author: "brolaski", theme: "survival" },
+            { text: "vertical lines in negative as rays", author: "brolaski", theme: "rupture" },
+
+            // PUIG (TransAlien Manifesto)
+            { text: "I am not from here / tú no eres de aquí", author: "puig", theme: "alien" },
+            { text: "TransAliens: Not from here.", author: "puig", theme: "threshold" },
+            { text: "we love too queerly, too weirdly, too much", author: "puig", theme: "borderland" },
+            { text: "my bodymindspirit is not render/able in this dimension", author: "puig", theme: "alien" },
+            { text: "shapeshifting across the sky", author: "puig", theme: "transformation" },
+
+            // HARTMAN (Venus in Two Acts)
+            { text: "critical fabulation: straining against the limits of the archive", author: "hartman", theme: "fabulation" },
+            { text: "what might have been / what could have been", author: "hartman", theme: "opacity" },
+            { text: "narrating stories which are impossible to tell", author: "hartman", theme: "threshold" },
+            { text: "amplifed the instability and discrepancy of the archive", author: "hartman", theme: "rupture" },
+
+            // VACCARO (Feelings & Fractals)
+            { text: "porous flesh: a politics of cohabitation", author: "vaccaro", theme: "leak" },
+            { text: "fleshy, fibrous seams of transformation, handmade and handcrafted identities", author: "vaccaro", theme: "transformation" },
+            { text: "handmade promise of the prefix trans", author: "vaccaro", theme: "threshold" },
+            { text: "coral is breathy and spineless", author: "vaccaro", theme: "tentacular" },
+
+            // SNORTON (Trans Capable)
+            { text: "the gender fungibility of blackness", author: "snorton", theme: "rupture" },
+            { text: "ungendering of blackness is also the context for imagining gender as subject to rearrangement", author: "snorton", theme: "transformation" },
+
+            // DERRIDA (Law of Genre)
+            { text: "participation never amounts to belonging", author: "derrida", theme: "threshold" },
+            { text: "a text cannot belong to no genre", author: "derrida", theme: "threshold" },
+
+            // FEINBERG (Stone Butch Blues)
+            { text: "the dream braided like sweetgrass in my memory", author: "feinberg", theme: "borderland" },
+            { text: "I closed my eyes and allowed my hopes to soar", author: "feinberg", theme: "survival" },
+            { text: "imagine a world worth fighting for", author: "feinberg", theme: "transformation" },
+            { text: "if I had to live my life again, I'd make the same decisions", author: "feinberg", theme: "threshold" },
+        ];
+
+        // === QUOTES FOR EVENTS (split/transform/death) ===
+        // Paired archival + fabulated quotes that appear during jellyfish transformations
+        const QUOTES = {
+            // Blue jellyfish quotes
+            blue: {
+                transform: [
+                    {
+                        archival: "various ways fungibility and fugitivity pass into one another", // Snorton
+                        fabulated: "the water practices that passing with me; I blur, and your category frays."
+                    },
+                    {
+                        archival: "the gender fungibility of blackness", // Snorton
+                        fabulated: "I swim with that history in my bell, slipping through every measuring net."
+                    },
+                    {
+                        archival: "Everything that exists is subject to change and development", // Feinberg
+                        fabulated: "the ocean accelerates that lesson, revising my outline with every pulse."
+                    }
+                ],
+                split: [
+                    {
+                        archival: "Was I their property now?", // Feinberg
+                        fabulated: "in this water I fracture ownership—each shard of me refuses to be owned."
+                    },
+                    {
+                        archival: "what might have been or could have been", // Hartman
+                        fabulated: "I divide into those tenses, drifting between them as an unfinished life."
+                    },
+                    {
+                        archival: "slip thru the fishing nets easy as pie", // Brolaski
+                        fabulated: "splitting only multiplies my exits through your mesh."
+                    }
+                ],
+                death: [
+                    {
+                        archival: "The pavement felt cold and hard against my cheek", // Feinberg
+                        fabulated: "here the seafloor is softer; even my ending rises in small bubbles of light."
+                    },
+                    {
+                        archival: "straining against the limits of the archive", // Hartman 
+                        fabulated: "my husk becomes another strain, a rumor the current carries beyond record."
+                    },
+                    {
+                        archival: "narrating stories which are impossible to tell", // Hartman
+                        fabulated: "so my disappearance stays a broken sentence, refusing to settle into your ledger."
+                    }
+                ]
+            },
+            // Pink jellyfish quotes
+            pink: {
+                transform: [
+                    {
+                        archival: "we love too queerly, too weirdly, too much, and too often", // Puig
+                        fabulated: "each molt is another too-much, a soft overfull glow you don't have words for."
+                    },
+                    {
+                        archival: "TransAliens: Not from here. Border crossers, shape shifters, spacetime travelers", // Puig
+                        fabulated: "my new bell arrives late to your timeline, on an orbit you can't quite chart."
+                    },
+                    {
+                        archival: "I closed my eyes and allowed my hopes to soar.", // Feinberg
+                        fabulated: "when I transform, those hopes surface as neon flesh and trembling light."
+                    }
+                ],
+                split: [
+                    {
+                        archival: "existing here is a willful choice: enacted hope", // Puig
+                        fabulated: "so when I split, it is another small insistence on staying anyway."
+                    },
+                    {
+                        archival: "Tonight I walked down streets looking for you in every woman's face", // Feinberg
+                        fabulated: "underwater I look for you in every reflection—each fragment a maybe-you."
+                    },
+                    {
+                        archival: "my voice was too obvious", // Brolaski
+                        fabulated: "so I scatter it into several softer bells, speaking in glows instead of words."
+                    }
+                ],
+                death: [
+                    {
+                        archival: "We will have forged a bond that can continue", // Feinberg
+                        fabulated: "even as I fade, that bond threads the water with faint pink phosphorescence."
+                    },
+                    {
+                        archival: "comrades in a lifelong struggle", // Feinberg
+                        fabulated: "our struggle lingers here as a low-frequency hum, long after the bodies go."
+                    },
+                    {
+                        archival: "B/borderland affects... forms of affection that keep us alive and that are impossible to classify", // Puig
+                        fabulated: "my last flicker is one of those loves, unfiled, unpronounceable, still glowing."
+                    }
+                ]
+            },
+            // White jellyfish quotes
+            white: {
+                transform: [
+                    {
+                        archival: "a mark of belonging or inclusion, does not properly pertain to any genre or class", // Derrida
+                        fabulated: "I transform at that edge—marked, but never properly contained, glowing outside every class you name."
+                    },
+                    {
+                        archival: "handmade promise of the prefix trans", // Vaccaro
+                        fabulated: "each new bell is another handmade clause, stitched from salt and voltage."
+                    },
+                    {
+                        archival: "participation without belonging", // Derrida
+                        fabulated: "I join your taxonomy only long enough to shimmer and slip away."
+                    }
+                ],
+                split: [
+                    {
+                        archival: "a text cannot belong to no genre", // Derrida
+                        fabulated: "so I divide myself until genre has nothing solid left to grab onto."
+                    },
+                    {
+                        archival: "porous flesh... a way we share a politics of cohabitation", // Vaccaro
+                        fabulated: "my fragments invite other impossible bodies to pass through and linger."
+                    },
+                    {
+                        archival: "instability and discrepancy of the archive", // Hartman
+                        fabulated: "I become one more instability, a misfiled glow that won't sit still in your records."
+                    }
+                ],
+                death: [
+                    {
+                        archival: "respect the limits of what cannot be known", // Hartman
+                        fabulated: "my disappearance leans into that limit, underlining it in dissolving ink."
+                    },
+                    {
+                        archival: "Imagine a world worth living in, a world worth fighting for", // Feinberg
+                        fabulated: "my ghost swims toward that world, long after the bell has gone slack."
+                    },
+                    {
+                        archival: "Genres are not to be mixed. I will not mix genres.", // Derrida
+                        fabulated: "yet even my dying smear is mixed—part poem, part record, part refusal."
+                    }
+                ]
+            }
+        };
+
+        // === COLOR PALETTES (based on trans flag) ===
+        const transPalettes = [
+            { name: 'blue', base: 0x7CCEFF, glow: 0xD1EDFF },
+            { name: 'pink',  base: 0xF7A8B8, glow: 0xFFB2D0 },
+            { name: 'white', base: 0xFFFFFF, glow: 0xFFFFFF }
+        ];
+
+        // Randomly pick a color palette with weighted probability
+        function pickTransPalette() {
+            const r = Math.random();
+            if (r < 0.45) return transPalettes[1]; // pink
+            if (r < 0.85) return transPalettes[2]; // white
+            return transPalettes[0];               // blue
+        }
+
+        // === THREE.JS SCENE GLOBALS ===
+        let scene, camera, renderer, jellies = [];
+        let raycaster, mouse;
+        const numJellies = 30;
+
+        // Camera control variables
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let cameraRotX = 0;
+        let cameraRotY = 0;
+        let cameraDistance = 40;
+        const minCameraDistance = 8;
+        const maxCameraDistance = 80;
+
+        let lastMouseClientX = window.innerWidth / 2;
+        let lastMouseClientY = window.innerHeight / 2;
+
+        // Environmental effects
+        let marineSnow;
+        const snowCount = 1400;
+        const snowRange = 60;
+
+        let borderSeamGroup;
+        let noisePlane;
+
+        let ripples = [];
+        let rippleGeometry, rippleMaterial;
+
+        // Ambient text whispers
+        let whispers = [];
+        const maxWhispers = 2;
+        let lastWhisperTime = 0;
+        const whisperInterval = 18;
+
+        // Quote particles for events
+        let quoteParticles = [];
+
+        // Kinship lines between jellyfish
+        let kinshipLines = [];
+
+        // Husk (ghost) visuals
+        let huskTrailParticles = [];
+        let huskTrailGeometry, huskTrailMaterial;
+
+        let huskPulses = [];
+        let huskPulseGeometry, huskPulseMaterial;
+
+        // Audio elements
+        let ambientAudio;
+        let splitAudio;
+        let transformAudio;
+        let whaleAudio;
+
+        // === SCENE INITIALIZATION ===
+        function init() {
+            // Create Three.js scene
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x00061A, 0.018);
+
+            // Setup camera
+            camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.z = cameraDistance;
+
+            // Setup renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000814, 1);
+            renderer.domElement.style.position = "absolute";
+            renderer.domElement.style.top = "0";
+            renderer.domElement.style.left = "0";
+            document.body.appendChild(renderer.domElement);
+
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0x334477, 0.5);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0x88ccff, 0.8);
+            directionalLight.position.set(10, 15, 8);
+            scene.add(directionalLight);
+
+            // Setup raycasting for mouse interactions
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Create environmental elements
+            createMarineSnow();
+            createBorderSeamGroup();
+            createBackgroundNoise();
+            createRippleResources();
+            createHuskVisualResources();
+
+            // Create initial jellyfish
+            for (let i = 0; i < numJellies; i++) {
+                createJellyfish();
+            }
+
+            // Add event listeners
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('click', onMouseClick);
+            window.addEventListener('mousedown', onMouseDown);
+            window.addEventListener('mouseup', onMouseUp);
+            window.addEventListener('keydown', onKeyDown);
+
+            // Setup audio
+            ambientAudio = document.getElementById('ambient-sound');
+            splitAudio = document.getElementById('split-sound');
+            transformAudio = document.getElementById('transform-sound');
+            whaleAudio = document.getElementById('whale-sound');
+            if (whaleAudio) whaleAudio.volume = 0.2;
+
+            if (ambientAudio) {
+                ambientAudio.volume = 1.0;
+                ambientAudio.play().catch(() => {});
+            }
+
+            // Start animation loop
+            animate();
+        }
+
+        // === MARINE SNOW (falling particles) ===
+        function createMarineSnow() {
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(snowCount * 3);
+
+            for (let i = 0; i < snowCount; i++) {
+                positions[i * 3 + 0] = (Math.random() - 0.5) * 80;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * snowRange * 2;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 80;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                color: 0x90e0ef,
+                size: 0.08,
+                transparent: true,
+                opacity: 0.7,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            marineSnow = new THREE.Points(geometry, material);
+            scene.add(marineSnow);
+        }
+
+        function updateMarineSnow() {
+            if (!marineSnow) return;
+            const positions = marineSnow.geometry.attributes.position;
+            for (let i = 0; i < positions.count; i++) {
+                let y = positions.getY(i);
+                y -= 0.03;
+                if (y < -snowRange) y = snowRange;
+                positions.setY(i, y);
+            }
+            positions.needsUpdate = true;
+        }
+
+        // === BACKGROUND NOISE PLANE ===
+        function createBackgroundNoise() {
+            const geometry = new THREE.PlaneGeometry(200, 120);
+            const texture = new THREE.TextureLoader().load(
+                "https://raw.githubusercontent.com/emmelleppi/noise-textures/main/noise7.png"
+            );
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(3, 2);
+
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                opacity: 0.06,
+                transparent: true,
+                depthWrite: false
+            });
+
+            noisePlane = new THREE.Mesh(geometry, material);
+            noisePlane.position.z = -60;
+            scene.add(noisePlane);
+        }
+
+        // === BORDER SEAM (vertical flowing planes representing threshold space) ===
+        function createBorderSeamGroup() {
+            borderSeamGroup = new THREE.Group();
+            const baseColors = [0x55CDFC, 0xF7A8B8, 0xFFFFFF];
+
+            for (let i = 0; i < 7; i++) {
+                const width = 1 + Math.random() * 2.5;
+                const height = 30 + Math.random() * 25;
+                const geometry = new THREE.PlaneGeometry(width, height, 16, 64);
+
+                const color = baseColors[i % baseColors.length];
+                const baseOpacity = 0.08 + Math.random() * 0.07;
+
+                const material = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: baseOpacity,
+                    side: THREE.DoubleSide,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending
+                });
+
+                const plane = new THREE.Mesh(geometry, material);
+                plane.position.x = (Math.random() - 0.5) * 2.0;
+                plane.position.z = (Math.random() - 0.5) * 1.4;
+                plane.position.y = (Math.random() - 0.5) * 5.0;
+                plane.rotation.y = Math.PI / 2 + (Math.random() - 0.5) * 0.5;
+                plane.userData.phase = Math.random() * Math.PI * 2;
+                plane.userData.baseOpacity = baseOpacity;
+
+                borderSeamGroup.add(plane);
+            }
+
+            borderSeamGroup.position.x = 0;
+            scene.add(borderSeamGroup);
+        }
+
+        // === RIPPLE EFFECTS ===
+        function createRippleResources() {
+            rippleGeometry = new THREE.RingGeometry(0.1, 0.12, 32);
+            rippleMaterial = new THREE.MeshBasicMaterial({
+                color: 0x90e0ef,
+                transparent: true,
+                opacity: 0.6,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+        }
+
+        function spawnRipple(position) {
+            const ripple = new THREE.Mesh(rippleGeometry, rippleMaterial.clone());
+            ripple.position.copy(position);
+            ripple.lookAt(new THREE.Vector3(0, 0, 0));
+            ripple.userData = {
+                radius: 0.1,
+                alpha: 0.6
+            };
+            ripple.scale.set(ripple.userData.radius, ripple.userData.radius, 1);
+            scene.add(ripple);
+            ripples.push(ripple);
+        }
+
+        function updateRipples() {
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const r = ripples[i];
+                r.userData.radius += 0.2;
+                r.userData.alpha -= 0.01;
+                r.scale.set(r.userData.radius, r.userData.radius, 1);
+                r.material.opacity = r.userData.alpha;
+
+                if (r.userData.alpha <= 0) {
+                    scene.remove(r);
+                    ripples.splice(i, 1);
+                }
+            }
+        }
+
+        // === HUSK VISUAL RESOURCES (ghost/afterlife effects) ===
+        function createHuskVisualResources() {
+            // Trail particles
+            huskTrailGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(3);
+            huskTrailGeometry.setAttribute(
+                'position',
+                new THREE.BufferAttribute(positions, 3)
+            );
+            huskTrailMaterial = new THREE.PointsMaterial({
+                color: 0x90e0ef,
+                size: 0.06,
+                transparent: true,
+                opacity: 0.7,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            // Pulse spheres
+            huskPulseGeometry = new THREE.SphereGeometry(0.25, 16, 16);
+            huskPulseMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.8,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+        }
+
+        function spawnHuskTrail(position) {
+            if (!huskTrailGeometry || !huskTrailMaterial) return;
+            const point = new THREE.Points(
+                huskTrailGeometry,
+                huskTrailMaterial.clone()
+            );
+            point.position.copy(position);
+            point.userData = { life: 1.0 };
+            scene.add(point);
+            huskTrailParticles.push(point);
+        }
+
+        function updateHuskTrails() {
+            for (let i = huskTrailParticles.length - 1; i >= 0; i--) {
+                const p = huskTrailParticles[i];
+                p.userData.life -= 0.02;
+                p.position.y -= 0.01;
+                p.material.opacity = 0.7 * p.userData.life;
+
+                if (p.userData.life <= 0) {
+                    scene.remove(p);
+                    huskTrailParticles.splice(i, 1);
+                }
+            }
+        }
+
+        function spawnHuskPulse(position, colorHex) {
+            if (!huskPulseGeometry || !huskPulseMaterial) return;
+            const mat = huskPulseMaterial.clone();
+            if (colorHex) mat.color.set(colorHex);
+
+            const pulse = new THREE.Mesh(huskPulseGeometry, mat);
+            pulse.position.copy(position);
+            pulse.userData = {
+                life: 1.0,
+                scale: 1.0
+            };
+            scene.add(pulse);
+            huskPulses.push(pulse);
+        }
+
+        function updateHuskPulses() {
+            for (let i = huskPulses.length - 1; i >= 0; i--) {
+                const p = huskPulses[i];
+                p.userData.life -= 0.02;
+                p.userData.scale += 0.03;
+
+                p.scale.setScalar(p.userData.scale);
+                p.material.opacity = 0.8 * p.userData.life;
+
+                if (p.userData.life <= 0) {
+                    scene.remove(p);
+                    huskPulses.splice(i, 1);
+                }
+            }
+        }
+
+        // === KINSHIP LINES (connections between jellyfish) ===
+        function createKinshipLine(jellyA, jellyB, kind) {
+            if (!jellyA || !jellyB) return;
+
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(6);
+            geometry.setAttribute(
+                'position',
+                new THREE.BufferAttribute(positions, 3)
+            );
+
+            const baseColor =
+                (jellyA.userData &&
+                    jellyA.userData.palette &&
+                    jellyA.userData.palette.base) ||
+                0x90e0ef;
+
+            // Different visual properties for different kinship types
+            let opacity, linewidth, minOpacity;
+            if (kind === 'persistent') {
+                opacity = 0.65;
+                linewidth = 2;
+                minOpacity = 0.35;
+            } else if (kind === 'proximity') {
+                opacity = 0.50;
+                linewidth = 1.5;
+                minOpacity = 0.20;
+            } else {
+                opacity = 0.75;
+                linewidth = 2;
+                minOpacity = 0.0;
+            }
+
+            const material = new THREE.LineBasicMaterial({
+                color: baseColor,
+                transparent: true,
+                opacity: opacity,
+                depthWrite: false,
+                linewidth: linewidth
+            });
+
+            const line = new THREE.Line(geometry, material);
+            scene.add(line);
+
+            kinshipLines.push({
+                line,
+                jellyA,
+                jellyB,
+                kind,
+                life: 1.0,
+                minOpacity: minOpacity,
+                maxOpacity: opacity
+            });
+        }
+
+        function updateKinshipLines() {
+            for (let i = kinshipLines.length - 1; i >= 0; i--) {
+                const k = kinshipLines[i];
+                const { line, jellyA, jellyB } = k;
+
+                if (!line) {
+                    kinshipLines.splice(i, 1);
+                    continue;
+                }
+
+                const posAttr = line.geometry.attributes.position;
+                let decay;
+                
+                if (k.kind === 'persistent') {
+                    decay = 0.001; // Very slow fade for sibling bonds
+                } else if (k.kind === 'proximity') {
+                    decay = 0.005; // Moderate fade for proximity bonds
+                } else {
+                    decay = 0.08; // Fast fade for pulse effects
+                }
+
+                // Update line position between two jellyfish
+                if (jellyA && jellyA.position && jellyB && jellyB.position) {
+                    const a = jellyA.position;
+                    const b = jellyB.position;
+                    posAttr.setXYZ(0, a.x, a.y, a.z);
+                    posAttr.setXYZ(1, b.x, b.y, b.z);
+                    posAttr.needsUpdate = true;
+                } else {
+                    decay = Math.max(decay, 0.05);
+                }
+
+                k.life -= decay;
+                if (k.life <= 0) {
+                    scene.remove(line);
+                    kinshipLines.splice(i, 1);
+                    continue;
+                }
+
+                const opacityRange = k.maxOpacity - k.minOpacity;
+                line.material.opacity = k.minOpacity + opacityRange * k.life;
+            }
+        }
+
+        // === JELLYFISH CREATION ===
+        function createJellyfish() {
+            const jelly = new THREE.Group();
+            const fragment = fragments[Math.floor(Math.random() * fragments.length)];
+            const palette = pickTransPalette();
+            const size = 0.5 + Math.random() * 1.5;
+            const type = palette.name;
+
+            // Create bell (main body)
+            const bellGeometry = new THREE.SphereGeometry(size, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.6);
+            const bellMaterial = new THREE.MeshPhongMaterial({
+                color: palette.base,
+                transparent: true,
+                opacity: 0.5,
+                side: THREE.DoubleSide,
+                shininess: 100,
+                emissive: palette.base,
+                emissiveIntensity: 0.35
+            });
+            const bell = new THREE.Mesh(bellGeometry, bellMaterial);
+            bell.userData.role = 'bell';
+            jelly.add(bell);
+
+            // Add type-specific decorations (stripes for pink)
+            if (palette.name === 'pink') {
+                const stripeMat = new THREE.MeshBasicMaterial({
+                    color: 0xD5225B,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const stripeCount = 10;
+                for (let i = 0; i < stripeCount; i++) {
+                    const stripeGeom = new THREE.CylinderGeometry(size * 0.03, size * 0.03, size * 1.4, 6);
+                    const stripe = new THREE.Mesh(stripeGeom, stripeMat);
+                    const angle = (i / stripeCount) * Math.PI * 2;
+                    stripe.position.x = Math.cos(angle) * size * 0.55;
+                    stripe.position.z = Math.sin(angle) * size * 0.55;
+                    stripe.position.y = 0.1 * size;
+                    stripe.userData.role = 'stripe';
+                    jelly.add(stripe);
+                }
+            }
+
+            // Add inner glow
+            const glowGeometry = new THREE.SphereGeometry(size * 0.6, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: palette.glow,
+                transparent: true,
+                opacity: 0.35
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.y = -size * 0.2;
+            glow.userData.role = 'glow';
+            jelly.add(glow);
+
+            // Add spots for white jellyfish
+            if (palette.name === 'white') {
+                const spotMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xFFFFFF,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const spotCount = 18;
+                for (let i = 0; i < spotCount; i++) {
+                    const spotGeom = new THREE.SphereGeometry(size * 0.12, 8, 8);
+                    const spot = new THREE.Mesh(spotGeom, spotMaterial);
+                    const theta = Math.random() * Math.PI * 0.6;
+                    const phi = Math.random() * Math.PI * 2;
+                    const r = size * 0.9;
+                    spot.position.set(
+                        r * Math.sin(theta) * Math.cos(phi),
+                        r * Math.cos(theta) * 0.7,
+                        r * Math.sin(theta) * Math.sin(phi)
+                    );
+                    spot.userData.role = 'spot';
+                    jelly.add(spot);
+                }
+            }
+
+            // Add tentacles
+            const numTentacles = 8 + Math.floor(Math.random() * 6);
+            for (let i = 0; i < numTentacles; i++) {
+                const angle = (i / numTentacles) * Math.PI * 2;
+                const tentacle = createTentacle(size, palette, false, type);
+                tentacle.position.x = Math.cos(angle) * size * 0.5;
+                tentacle.position.z = Math.sin(angle) * size * 0.5;
+                jelly.add(tentacle);
+            }
+
+            // Set initial position and movement parameters
+            const origin = new THREE.Vector3(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 40
+            );
+            jelly.position.copy(origin);
+
+            jelly.userData = {
+                fragment: fragment,
+                palette: palette,
+                type: type,
+                size: size,
+                pulsePhase: Math.random() * Math.PI * 2,
+                rotationSpeed: {
+                    x: (Math.random() - 0.5) * 0.01,
+                    y: (Math.random() - 0.5) * 0.01,
+                    z: (Math.random() - 0.5) * 0.01
+                },
+                isTransforming: false,
+                transformTimer: 0,
+                swimOrigin: origin.clone(),
+                swimPhase: Math.random() * Math.PI * 2,
+                swimSpeed: 0.003 + Math.random() * 0.004,
+                swimRadius: 4 + Math.random() * 7,
+                swimVerticalAmp: 2 + Math.random() * 3
+            };
+
+            scene.add(jelly);
+            jellies.push(jelly);
+        }
+
+        // Create tentacles for jellyfish (appearance varies by type)
+        function createTentacle(size, palette, isGiant, type) {
+            const tentacleGroup = new THREE.Group();
+            let segments, length, radiusScale, opacityStart;
+
+            // Different tentacle styles for each type
+            if (type === 'blue') {
+                segments = 18;
+                length = size * 4.0;
+                radiusScale = 0.06;
+                opacityStart = 0.4;
+            } else if (type === 'pink') {
+                segments = 32;
+                length = size * 7.5;
+                radiusScale = 0.012;
+                opacityStart = 0.9;
+            } else {
+                segments = 8;
+                length = size * 2.2;
+                radiusScale = 0.12;
+                opacityStart = 0.65;
+            }
+
+            // Create segmented tentacle
+            for (let i = 0; i < segments; i++) {
+                const t = i / segments;
+                const segmentLength = length / segments;
+                const segmentRadius = size * radiusScale * (1 - t * 0.3);
+
+                const geometry = new THREE.CylinderGeometry(
+                    segmentRadius,
+                    segmentRadius * 0.9,
+                    segmentLength,
+                    type === 'white' ? 10 : 6
+                );
+
+                const material = new THREE.MeshPhongMaterial({
+                    color: palette.base,
+                    transparent: true,
+                    opacity: opacityStart - t * (opacityStart * 0.7),
+                    emissive: palette.base,
+                    emissiveIntensity: type === 'pink' ? 1.2 : 0.3
+                });
+
+                const segment = new THREE.Mesh(geometry, material);
+                segment.position.y = -(segmentLength * i);
+                segment.userData.offset = Math.random() * Math.PI * 2;
+                segment.userData.role = 'tentacle';
+
+                // Set wave intensity per type
+                if (type === 'pink') {
+                    segment.userData.ribbonFactor = 3.8;
+                } else if (type === 'white') {
+                    segment.userData.ribbonFactor = 0.7;
+                } else {
+                    segment.userData.ribbonFactor = 1.0;
+                }
+
+                tentacleGroup.add(segment);
+            }
+
+            if (type === 'pink') {
+                tentacleGroup.position.y = -size * 0.65;
+            } else {
+                tentacleGroup.position.y = -size * 0.3;
+            }
+
+            return tentacleGroup;
+        }
+
+        // Create jellyfish with specific palette (used for transformation)
+        function createSpecificJellyfish(palette) {
+            const jelly = new THREE.Group();
+            const fragment = fragments[Math.floor(Math.random() * fragments.length)];
+            const size = 0.5 + Math.random() * 1.5;
+            const type = palette.name;
+
+            const bellGeometry = new THREE.SphereGeometry(size, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.6);
+            const bellMaterial = new THREE.MeshPhongMaterial({
+                color: palette.base,
+                transparent: true,
+                opacity: 0.5,
+                emissive: palette.base,
+                emissiveIntensity: 0.35
+            });
+            const bell = new THREE.Mesh(bellGeometry, bellMaterial);
+            bell.userData.role = 'bell';
+            jelly.add(bell);
+
+            if (type === 'pink') {
+                const stripeMat = new THREE.MeshBasicMaterial({ color: 0xD5225B, transparent: true, opacity: 0.8 });
+                for (let i = 0; i < 10; i++) {
+                    const stripeGeom = new THREE.CylinderGeometry(size * 0.03, size * 0.03, size * 1.4, 6);
+                    const stripe = new THREE.Mesh(stripeGeom, stripeMat);
+                    const angle = (i / 10) * Math.PI * 2;
+                    stripe.position.x = Math.cos(angle) * size * 0.55;
+                    stripe.position.z = Math.sin(angle) * size * 0.55;
+                    stripe.position.y = 0.1 * size;
+                    stripe.userData.role = 'stripe';
+                    jelly.add(stripe);
+                }
+            }
+
+            if (type === 'white') {
+                const spotMat = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.9, transparent: true });
+                for (let i = 0; i < 18; i++) {
+                    const spotGeom = new THREE.SphereGeometry(size * 0.12, 8, 8);
+                    const theta = Math.random() * Math.PI * 0.6;
+                    const phi = Math.random() * Math.PI * 2;
+                    const r = size * 0.9;
+                    const spot = new THREE.Mesh(spotGeom, spotMat);
+                    spot.position.set(
+                        r * Math.sin(theta) * Math.cos(phi),
+                        r * Math.cos(theta) * 0.7,
+                        r * Math.sin(theta) * Math.sin(phi)
+                    );
+                    spot.userData.role = 'spot';
+                    jelly.add(spot);
+                }
+            }
+
+            const glowGeometry = new THREE.SphereGeometry(size * 0.6, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({ color: palette.glow, transparent: true, opacity: 0.35 });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.y = -size * 0.2;
+            glow.userData.role = 'glow';
+            jelly.add(glow);
+
+            const numTentacles = 8 + Math.floor(Math.random() * 6);
+            for (let i = 0; i < numTentacles; i++) {
+                const angle = (i / numTentacles) * Math.PI * 2;
+                const tentacle = createTentacle(size, palette, false, type);
+                tentacle.position.x = Math.cos(angle) * size * 0.5;
+                tentacle.position.z = Math.sin(angle) * size * 0.5;
+                jelly.add(tentacle);
+            }
+
+            const origin = new THREE.Vector3(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 40
+            );
+            jelly.position.copy(origin);
+
+            jelly.userData = {
+                fragment: fragment,
+                palette: palette,
+                type: type,
+                size: size,
+                pulsePhase: Math.random() * Math.PI * 2,
+                rotationSpeed: {
+                    x: (Math.random() - 0.5) * 0.01,
+                    y: (Math.random() - 0.5) * 0.01,
+                    z: (Math.random() - 0.5) * 0.01
+                },
+                isTransforming: false,
+                transformTimer: 0,
+                swimOrigin: origin.clone(),
+                swimPhase: Math.random() * Math.PI * 2,
+                swimSpeed: 0.003 + Math.random() * 0.004,
+                swimRadius: 4 + Math.random() * 7,
+                swimVerticalAmp: 2 + Math.random() * 3
+            };
+
+            scene.add(jelly);
+            jellies.push(jelly);
+            return jelly;
+        }
+
+
+        // === MAIN ANIMATION LOOP ===
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = Date.now() * 0.001;
+
+            // Randomly play whale sounds
+            if (typeof whaleAudio !== "undefined" && whaleAudio && Math.random() < 0.0005) {
+                whaleAudio.currentTime = 0;
+                whaleAudio.play().catch(() => {});
+            }
+
+            // Update all visual systems
+            updateMarineSnow();
+            updateRipples();
+            updateHuskTrails();
+            updateHuskPulses();
+            updateWhispers();
+            updateQuoteParticles();
+
+            // Animate background noise
+            if (noisePlane && noisePlane.material && noisePlane.material.map) {
+                noisePlane.material.map.offset.x += 0.0003;
+                noisePlane.material.map.offset.y += 0.00015;
+            }
+
+            // Update each jellyfish
+            for (let i = jellies.length - 1; i >= 0; i--) {
+                const jelly = jellies[i];
+                const data = jelly.userData || {};
+
+                // Handle husk (ghost) jellyfish differently
+                if (data.isHusk) {
+                    if (data.huskDrift) {
+                        jelly.position.add(data.huskDrift);
+                    }
+
+                    jelly.rotation.y += 0.002;
+                    jelly.scale.multiplyScalar(0.992);
+                    data.huskLife *= 0.985;
+
+                    // Spawn trailing particles
+                    if (Math.random() < 0.06) {
+                        spawnHuskTrail(jelly.position);
+                    }
+
+                    // Periodically spawn pulses
+                    if (!data.nextPulseTime) {
+                        data.nextPulseTime = time + 3 + Math.random() * 2;
+                    }
+                    if (time >= data.nextPulseTime) {
+                        const c =
+                            (data.palette && data.palette.base) || 0x90e0ef;
+                        spawnHuskPulse(jelly.position, c);
+                        data.nextPulseTime = time + 3 + Math.random() * 2;
+                    }
+
+                    // Fade out opacity
+                    jelly.traverse(child => {
+                        if (
+                            child.isMesh &&
+                            child.material &&
+                            child.material.transparent
+                        ) {
+                            child.material.opacity *= 0.985;
+                        }
+                    });
+
+                    // Remove when fully faded
+                    if (data.huskLife < 0.05) {
+                        scene.remove(jelly);
+                        jellies.splice(i, 1);
+                    }
+                    continue;
+                }
+
+                // Normal jellyfish animation
+                // Pulsing scale animation
+                const pulse = Math.sin(time * 2 + data.pulsePhase) * 0.1 + 1;
+
+                if (data.moltGrow && data.moltGrow < 1) {
+                    data.moltGrow += 0.02;
+                    if (data.moltGrow > 1) data.moltGrow = 1;
+                }
+                const grow = data.moltGrow || 1;
+
+                jelly.scale.set(
+                    pulse * grow,
+                    pulse * 0.9 * grow,
+                    pulse * grow
+                );
+
+                // Swimming movement (circular path with vertical waves)
+                data.swimPhase += data.swimSpeed;
+                const px = data.swimOrigin.x + Math.cos(data.swimPhase) * data.swimRadius;
+                const pz = data.swimOrigin.z + Math.sin(data.swimPhase * 0.85) * data.swimRadius * 0.7;
+                const py = data.swimOrigin.y + Math.sin(data.swimPhase * 1.4) * data.swimVerticalAmp;
+                jelly.position.set(px, py, pz);
+
+                jelly.rotation.y += data.rotationSpeed.y;
+
+                // Apply drift velocity for split jellies (they float apart independently)
+                if (data.driftVelocity) {
+                    jelly.position.add(data.driftVelocity);
+                    data.driftVelocity.multiplyScalar(0.992); // Very gradual slowdown
+                    
+                    // Remove drift when negligible (after ~500 frames of drifting)
+                    if (data.driftVelocity.length() < 0.0005) {
+                        delete data.driftVelocity;
+                    }
+                }
+
+                // Tilting animation
+                const maxTiltX = 0.35;
+                const maxTiltZ = 0.2;
+                jelly.rotation.x = Math.sin(time * 0.7 + data.pulsePhase) * maxTiltX;
+                jelly.rotation.z = Math.cos(time * 0.9 + data.pulsePhase) * maxTiltZ;
+
+                // Animate tentacles (wavelike motion)
+                jelly.children.forEach((child, ci) => {
+                    if (ci > 1 && child.children) {
+                        child.children.forEach((segment, j) => {
+                            const factor = (segment.userData && segment.userData.ribbonFactor) || 1.0;
+                            const offset = segment.userData ? segment.userData.offset : 0;
+
+                            const waveX = Math.sin(time * 2.2 + offset + j * 0.15) * 0.2 * factor;
+                            const waveZ = Math.cos(time * 1.6 + offset + j * 0.25) * 0.18 * factor;
+
+                            segment.rotation.x = waveX;
+                            segment.rotation.z = waveZ;
+                        });
+                    }
+                });
+
+                // Emissive glow pulsing
+                const bell = jelly.children[0];
+                if (bell && bell.material && bell.material.emissiveIntensity !== undefined) {
+                    const glowPulse = 0.5 + 0.15 * Math.sin(time * 1.5 + data.pulsePhase);
+                    bell.material.emissiveIntensity = glowPulse;
+                }
+
+                // Transformation glitch effect
+                if (data.isTransforming) {
+                    data.transformTimer++;
+                    const glitchAmount = Math.sin(data.transformTimer * 0.15) * 0.4;
+                    jelly.position.x += glitchAmount;
+
+                    if (data.transformTimer > 60) {
+                        data.isTransforming = false;
+                        data.transformTimer = 0;
+                        mutateJellyfish(jelly);
+                    }
+                }
+            }
+
+            // Animate border seam
+            if (borderSeamGroup) {
+                borderSeamGroup.position.x = Math.sin(time * 0.25) * 1.5;
+                borderSeamGroup.children.forEach((plane, idx) => {
+                    const phase = time * 0.8 + plane.userData.phase;
+                    plane.material.opacity = plane.userData.baseOpacity + 0.04 * Math.sin(phase * 1.3);
+                    plane.rotation.z = 0.25 * Math.sin(time * 0.6 + idx * 1.3);
+                    plane.position.y = Math.sin(phase) * 2.0;
+                });
+            }
+
+            // ENHANCED PROXIMITY-BASED KINSHIP: Check all same-type jellyfish pairs
+            for (let i = 0; i < jellies.length; i++) {
+                const a = jellies[i];
+                const da = a.userData || {};
+                if (da.isHusk) continue;
+
+                for (let j = i + 1; j < jellies.length; j++) {
+                    const b = jellies[j];
+                    const db = b.userData || {};
+                    if (db.isHusk) continue;
+
+                    // Only form kinship between same-type jellyfish
+                    if (da.type && db.type && da.type === db.type) {
+                        const dist = a.position.distanceTo(b.position);
+                        
+                        // Check if kinship line already exists between these two
+                        const existingLine = kinshipLines.find(k => 
+                            (k.jellyA === a && k.jellyB === b) || 
+                            (k.jellyA === b && k.jellyB === a)
+                        );
+                        
+                        if (dist < 12.0) {
+                            // Within kinship range - create constellations!
+                            if (!existingLine) {
+                                // Create new proximity-based kinship line (more frequently)
+                                if (Math.random() < 0.08) {
+                                    createKinshipLine(a, b, 'proximity');
+                                }
+                            } else if (existingLine.kind === 'proximity') {
+                                // Strengthen existing proximity line when close
+                                existingLine.life = Math.min(1.0, existingLine.life + 0.01);
+                            }
+                        } else if (existingLine && existingLine.kind === 'proximity') {
+                            // Outside range - let proximity lines fade faster
+                            existingLine.life -= 0.015;
+                        }
+                    }
+                }
+            }
+
+            updateKinshipLines();
+
+            // Camera orbit with drift
+            const r = cameraDistance;
+            const driftY = Math.sin(time * 0.03) * 0.4;
+            const driftX = Math.cos(time * 0.02) * 0.35;
+            const rotYTotal = cameraRotY + driftY;
+            const rotXTotal = cameraRotX + driftX;
+            const cx = Math.cos(rotXTotal);
+
+            camera.position.x = r * Math.sin(rotYTotal) * cx;
+            camera.position.z = r * Math.cos(rotYTotal) * cx;
+            camera.position.y = r * Math.sin(rotXTotal);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+            // Raycasting for hover effects
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(jellies, true);
+
+            if (intersects.length > 0) {
+                let parent = intersects[0].object;
+                while (parent.parent && parent.parent.type !== 'Scene') {
+                    parent = parent.parent;
+                }
+                if (!parent.userData.isHusk) {
+                    displayFragment(parent.userData.fragment, parent.userData);
+                } else {
+                    document.getElementById('hover-text').style.display = 'none';
+                }
+            } else {
+                document.getElementById('hover-text').style.display = 'none';
+            }
+
+            // Spawn whispers periodically
+            const tNow = time;
+            if (tNow - lastWhisperTime > whisperInterval && whispers.length < maxWhispers) {
+                spawnWhisper();
+                lastWhisperTime = tNow;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Slight path mutation (no color change)
+        function mutateJellyfish(jelly) {
+            const data = jelly.userData;
+            data.swimOrigin.add(new THREE.Vector3(
+                (Math.random() - 0.5) * 2,
+                (Math.random() - 0.5) * 2,
+                (Math.random() - 0.5) * 2
+            ));
+        }
+
+        // === SPLITTING (click event: jellyfish divides) ===
+        function splitJellyfish(jelly) {
+            const index = jellies.indexOf(jelly);
+            if (index > -1) {
+                spawnRipple(jelly.position);
+
+                if (splitAudio) {
+                    splitAudio.currentTime = 0;
+                    splitAudio.play().catch(() => {});
+                }
+
+                const parentType = jelly.userData.type;
+                const parentPalette = jelly.userData.palette;
+
+                spawnQuoteForEvent(jelly, "split");
+
+                jellies.splice(index, 1);
+                scene.remove(jelly);
+
+                const children = [];
+
+                // Create two child jellyfish
+                for (let i = 0; i < 2; i++) {
+                    const newJelly = cloneJellyfishFrom(
+                        jelly,
+                        parentPalette,
+                        parentType
+                    );
+                    newJelly.position.copy(jelly.position);
+                    const dir = i === 0 ? -1 : 1;
+                    
+                    // Moderate separation - visible but not too far
+                    newJelly.position.x += dir * 5.5 + (Math.random() - 0.5) * 1.5;
+                    newJelly.position.y += dir * 2.0 + (Math.random() - 0.5) * 1.0;
+                    newJelly.position.z += dir * 3.5 + (Math.random() - 0.5) * 1.0;
+                    
+                    // Independent drift velocity
+                    const driftStrength = 0.025 + Math.random() * 0.01;
+                    newJelly.userData.driftVelocity = new THREE.Vector3(
+                        dir * driftStrength + (Math.random() - 0.5) * 0.015,
+                        (Math.random() - 0.5) * 0.015,
+                        dir * (driftStrength * 0.6) + (Math.random() - 0.5) * 0.015
+                    );
+                    
+                    // Different swim origins
+                    newJelly.userData.swimOrigin.add(new THREE.Vector3(
+                        (Math.random() - 0.5) * 5,
+                        (Math.random() - 0.5) * 3,
+                        (Math.random() - 0.5) * 5
+                    ));
+                    
+                    // Varied swim parameters
+                    newJelly.userData.swimSpeed *= (0.9 + Math.random() * 0.2);
+                    newJelly.userData.swimPhase += (Math.random() - 0.5) * Math.PI * 0.5;
+
+                    children.push(newJelly);
+                }
+                
+                // Create persistent kinship line between siblings
+                if (children.length === 2) {
+                    createKinshipLine(children[0], children[1], 'persistent');
+                }
+            }
+        }
+
+        // === TRANSFORM / MOLT (click event: jellyfish changes type, leaves husk) ===
+        function transformJellyfish(jelly) {
+            const oldData = jelly.userData;
+            const oldPos = jelly.position.clone();
+
+            const oldType = oldData.type;
+            const oldFragment = oldData.fragment;
+
+            // Save swimming parameters
+            const swimParams = {
+                origin: oldData.swimOrigin.clone(),
+                phase: oldData.swimPhase,
+                speed: oldData.swimSpeed,
+                radius: oldData.swimRadius,
+                verticalAmp: oldData.swimVerticalAmp
+            };
+
+            // Convert old jellyfish to husk (ghost)
+            oldData.isHusk = true;
+            oldData.huskLife = 1.0;
+            oldData.huskDrift = new THREE.Vector3(
+                (Math.random() - 0.5) * 0.01,
+                -(0.01 + Math.random() * 0.02),
+                (Math.random() - 0.5) * 0.01
+            );
+            oldData.nextPulseTime = null;
+
+            jelly.traverse(child => {
+                if (child.isMesh && child.material) {
+                    child.material.transparent = true;
+                    child.material.opacity *= 0.8;
+                }
+            });
+
+            // Spawn death quote after delay
+            setTimeout(() => {
+                if (jelly.userData && jelly.userData.isHusk) {
+                    spawnQuoteForEvent(jelly, "death");
+                }
+            }, 1800);
+
+            // Create new jellyfish with different type
+            let newPalette = pickTransPalette();
+            let safety = 0;
+            while (newPalette.name === oldType && safety < 10) {
+                newPalette = pickTransPalette();
+                safety++;
+            }
+
+            const newJelly = createSpecificJellyfish(newPalette);
+            const nd = newJelly.userData;
+
+            newJelly.position.copy(oldPos);
+            newJelly.position.y -= 0.4;
+
+            // Inherit swimming parameters
+            nd.swimOrigin.copy(swimParams.origin);
+            nd.swimPhase = swimParams.phase;
+            nd.swimSpeed = swimParams.speed;
+            nd.swimRadius = swimParams.radius;
+            nd.swimVerticalAmp = swimParams.verticalAmp;
+
+            nd.fragment = getDifferentFragment(oldFragment);
+
+            // Start small and grow
+            nd.moltGrow = 0.6;
+            newJelly.scale.set(0.6, 0.6 * 0.9, 0.6);
+
+            nd.isTransforming = true;
+            nd.transformTimer = 0;
+
+            spawnQuoteForEvent(newJelly, "transform");
+
+            if (transformAudio) {
+                transformAudio.currentTime = 0;
+                transformAudio.play().catch(() => {});
+            }
+        }
+
+        // Clone jellyfish for splitting
+        function cloneJellyfishFrom(source, palette, type) {
+            const fragment = fragments[Math.floor(Math.random() * fragments.length)];
+            const size = source.userData.size * 0.7;
+            const jelly = new THREE.Group();
+
+            const bellGeometry = new THREE.SphereGeometry(size, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.6);
+            const bellMaterial = new THREE.MeshPhongMaterial({
+                color: palette.base,
+                transparent: true,
+                opacity: 0.5,
+                side: THREE.DoubleSide,
+                shininess: 100,
+                emissive: palette.base,
+                emissiveIntensity: 0.35
+            });
+            const bell = new THREE.Mesh(bellGeometry, bellMaterial);
+            bell.userData.role = 'bell';
+            jelly.add(bell);
+
+            if (type === 'pink') {
+                const stripeMat = new THREE.MeshBasicMaterial({
+                    color: 0xD5225B,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const stripeCount = 10;
+                for (let i = 0; i < stripeCount; i++) {
+                    const stripeGeom = new THREE.CylinderGeometry(size * 0.03, size * 0.03, size * 1.4, 6);
+                    const stripe = new THREE.Mesh(stripeGeom, stripeMat);
+                    const angle = (i / stripeCount) * Math.PI * 2;
+                    stripe.position.x = Math.cos(angle) * size * 0.55;
+                    stripe.position.z = Math.sin(angle) * size * 0.55;
+                    stripe.position.y = 0.1 * size;
+                    stripe.userData.role = 'stripe';
+                    jelly.add(stripe);
+                }
+            }
+
+            const glowGeometry = new THREE.SphereGeometry(size * 0.6, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: palette.glow,
+                transparent: true,
+                opacity: 0.35
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.y = -size * 0.2;
+            glow.userData.role = 'glow';
+            jelly.add(glow);
+
+            if (type === 'white') {
+                const spotMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xFFFFFF,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const spotCount = 14;
+                for (let i = 0; i < spotCount; i++) {
+                    const spotGeom = new THREE.SphereGeometry(size * 0.12, 8, 8);
+                    const spot = new THREE.Mesh(spotGeom, spotMaterial);
+                    const theta = Math.random() * Math.PI * 0.6;
+                    const phi = Math.random() * Math.PI * 2;
+                    const r = size * 0.9;
+                    spot.position.set(
+                        r * Math.sin(theta) * Math.cos(phi),
+                        r * Math.cos(theta) * 0.7,
+                        r * Math.sin(theta) * Math.sin(phi)
+                    );
+                    spot.userData.role = 'spot';
+                    jelly.add(spot);
+                }
+            }
+
+            const numTentacles = 8 + Math.floor(Math.random() * 4);
+            for (let i = 0; i < numTentacles; i++) {
+                const angle = (i / numTentacles) * Math.PI * 2;
+                const tentacle = createTentacle(size, palette, false, type);
+                tentacle.position.x = Math.cos(angle) * size * 0.5;
+                tentacle.position.z = Math.sin(angle) * size * 0.5;
+                jelly.add(tentacle);
+            }
+
+            const origin = source.userData.swimOrigin.clone();
+            jelly.position.copy(source.position);
+            jelly.position.x += (Math.random() - 0.5) * 1.2;
+            jelly.position.y += (Math.random() - 0.5) * 1.2;
+            jelly.position.z += (Math.random() - 0.5) * 0.8;
+
+            jelly.userData = {
+                fragment: fragment,
+                palette: palette,
+                type: type,
+                size: size,
+                pulsePhase: Math.random() * Math.PI * 2,
+                swimOrigin: origin.clone(),
+                swimPhase: source.userData.swimPhase + (Math.random() * 0.4 - 0.2),
+                swimSpeed: source.userData.swimSpeed,
+                swimRadius: source.userData.swimRadius * (0.9 + Math.random() * 0.2),
+                swimVerticalAmp: source.userData.swimVerticalAmp * (0.9 + Math.random() * 0.2),
+                rotationSpeed: {
+                    x: (Math.random() - 0.5) * 0.003,
+                    y: (Math.random() - 0.5) * 0.003,
+                    z: (Math.random() - 0.5) * 0.003
+                },
+                isTransforming: false,
+                transformTimer: 0
+            };
+
+            scene.add(jelly);
+            jellies.push(jelly);
+            return jelly;
+        }
+
+        // === WHISPERS (ambient floating text) ===
+        function spawnWhisper() {
+            const fragment = fragments[Math.floor(Math.random() * fragments.length)];
+            const pos = new THREE.Vector3(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 25,
+                (Math.random() - 0.5) * 30
+            );
+
+            const div = document.createElement('div');
+            div.className = 'whisper';
+            div.textContent = fragment.text;
+            document.body.appendChild(div);
+
+            whispers.push({
+                fragment,
+                pos,
+                life: 1.0,
+                div
+            });
+        }
+
+        function updateWhispers() {
+            for (let i = whispers.length - 1; i >= 0; i--) {
+                const w = whispers[i];
+                w.life -= 0.003;
+                if (w.life <= 0) {
+                    if (w.div && w.div.parentNode) {
+                        w.div.parentNode.removeChild(w.div);
+                    }
+                    whispers.splice(i, 1);
+                    continue;
+                }
+
+                // Project 3D position to screen coordinates
+                const projected = w.pos.clone().project(camera);
+                const x = (projected.x * 0.5 + 0.5) * window.innerWidth;
+                const y = (-projected.y * 0.5 + 0.5) * window.innerHeight;
+
+                w.div.style.left = x + 'px';
+                w.div.style.top = y + 'px';
+                w.div.style.opacity = (0.2 * w.life).toString();
+            }
+        }
+
+        // === QUOTE PARTICLES (appear during events) ===
+        function getRandomQuoteForEvent(species, eventType) {
+            const speciesQuotes = QUOTES[species];
+            if (!speciesQuotes) return null;
+            const pool = speciesQuotes[eventType];
+            if (!pool || pool.length === 0) return null;
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        function spawnQuoteForEvent(jelly, eventType) {
+            if (!jelly || !jelly.userData) return;
+            const species = jelly.userData.type;
+            const quote = getRandomQuoteForEvent(species, eventType);
+            if (!quote) return;
+
+            // Create archival quote element
+            const archDiv = document.createElement('div');
+            archDiv.className = 'quote-fragment archival';
+            archDiv.textContent = quote.archival;
+
+            // Create fabulated quote element
+            const fabDiv = document.createElement('div');
+            fabDiv.className = 'quote-fragment fabulated';
+            fabDiv.textContent = quote.fabulated;
+
+            // Special styling for death quotes
+            if (eventType === "death") {
+                archDiv.style.color = "#7c8ba1";
+                fabDiv.style.color = "#e5e9f5";
+                archDiv.style.fontStyle = "italic";
+                fabDiv.style.fontStyle = "italic";
+            }
+
+            document.body.appendChild(archDiv);
+            document.body.appendChild(fabDiv);
+
+            const basePos = jelly.position.clone();
+            const mode = (eventType === "transform") ? "spiral" : "drift";
+
+            quoteParticles.push({
+                mode,
+                eventType,
+                center: basePos.clone(),
+                angle: Math.random() * Math.PI * 2,
+                radius: 0,
+                angularSpeed: 0.05 + Math.random() * 0.03,
+                upSpeed: 0.015 + Math.random() * 0.01,
+                pos: basePos.clone(),
+                vel: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.02,
+                    0.02 + Math.random() * 0.02,
+                    (Math.random() - 0.5) * 0.02
+                ),
+                life: 1.0,
+                archivalDiv: archDiv,
+                fabulatedDiv: fabDiv
+            });
+        }
+
+        function updateQuoteParticles() {
+            for (let i = quoteParticles.length - 1; i >= 0; i--) {
+                const qp = quoteParticles[i];
+                qp.life -= 0.006;
+
+                if (qp.life <= 0) {
+                    if (qp.archivalDiv && qp.archivalDiv.parentNode) {
+                        qp.archivalDiv.parentNode.removeChild(qp.archivalDiv);
+                    }
+                    if (qp.fabulatedDiv && qp.fabulatedDiv.parentNode) {
+                        qp.fabulatedDiv.parentNode.removeChild(qp.fabulatedDiv);
+                    }
+                    quoteParticles.splice(i, 1);
+                    continue;
+                }
+
+                // Animate position based on mode
+                if (qp.mode === "spiral") {
+                    qp.angle += qp.angularSpeed;
+                    qp.radius += 0.01;
+                    qp.center.y += qp.upSpeed;
+                    qp.pos.x = qp.center.x + Math.cos(qp.angle) * qp.radius;
+                    qp.pos.z = qp.center.z + Math.sin(qp.angle) * qp.radius;
+                    qp.pos.y = qp.center.y;
+                } else {
+                    qp.pos.add(qp.vel);
+                    qp.vel.multiplyScalar(0.98);
+                }
+
+                // Project to screen and position elements
+                const projected = qp.pos.clone().project(camera);
+                const x = (projected.x * 0.5 + 0.5) * window.innerWidth;
+                const yBase = (-projected.y * 0.5 + 0.5) * window.innerHeight;
+
+                let offsetY;
+                if (qp.eventType === "transform") {
+                    offsetY = -24;
+                } else if (qp.eventType === "death") {
+                    offsetY = 80;
+                } else {
+                    offsetY = -14;
+                }
+
+                qp.archivalDiv.style.left = x + 'px';
+                qp.archivalDiv.style.top = (yBase + offsetY) + 'px';
+
+                const archivalHeight = qp.archivalDiv.offsetHeight || 16;
+
+                qp.fabulatedDiv.style.left = x + 'px';
+                qp.fabulatedDiv.style.top = (yBase + offsetY + archivalHeight + 4) + 'px';
+
+                let op = qp.life * 0.9;
+                if (qp.eventType === "death") {
+                    op *= 0.75;
+                }
+
+                qp.archivalDiv.style.opacity = (op * 0.8).toString();
+                qp.fabulatedDiv.style.opacity = op.toString();
+
+                const blurAmount = (1 - qp.life) * 2;
+                const blurStr = `blur(${blurAmount.toFixed(2)}px)`;
+                qp.archivalDiv.style.filter = blurStr;
+                qp.fabulatedDiv.style.filter = blurStr;
+            }
+        }
+
+        // === INPUT HANDLERS ===
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            lastMouseClientX = event.clientX;
+            lastMouseClientY = event.clientY;
+
+            // Handle camera dragging
+            if (isDragging) {
+                const deltaX = event.clientX - dragStartX;
+                const deltaY = event.clientY - dragStartY;
+
+                cameraRotY += deltaX * 0.005;
+                cameraRotX += deltaY * 0.005;
+
+                const maxTilt = Math.PI / 2 - 0.1;
+                cameraRotX = Math.max(-maxTilt, Math.min(maxTilt, cameraRotX));
+
+                dragStartX = event.clientX;
+                dragStartY = event.clientY;
+            }
+        }
+
+        function onMouseDown(event) {
+            isDragging = true;
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+        }
+
+        function onKeyDown(event) {
+            const zoomStep = 1.5;
+            const rotStep = 0.08;
+            const tiltStep = 0.06;
+
+            // Keyboard controls
+            if (event.key === 'h' || event.key === 'H') {
+                event.preventDefault();
+                toggleInfo();
+            } else if (event.key === 'w' || event.key === 'W') {
+                event.preventDefault();
+                cameraDistance -= zoomStep;
+            } else if (event.key === 's' || event.key === 'S') {
+                event.preventDefault();
+                cameraDistance += zoomStep;
+            } else if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                cameraRotY -= rotStep;
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                cameraRotY += rotStep;
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                cameraRotX += tiltStep;
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                cameraRotX -= tiltStep;
+            }
+
+            // Clamp camera distance and tilt
+            if (cameraDistance < minCameraDistance) cameraDistance = minCameraDistance;
+            if (cameraDistance > maxCameraDistance) cameraDistance = maxCameraDistance;
+
+            const maxTilt = Math.PI / 2 - 0.1;
+            cameraRotX = Math.max(-maxTilt, Math.min(maxTilt, cameraRotX));
+        }
+
+        // Get a different fragment from current one
+        function getDifferentFragment(currentFragment) {
+            if (!currentFragment) {
+                return fragments[Math.floor(Math.random() * fragments.length)];
+            }
+
+            let newFrag = currentFragment;
+            let safety = 0;
+            while (
+                newFrag.text === currentFragment.text &&
+                newFrag.author === currentFragment.author &&
+                newFrag.theme === currentFragment.theme &&
+                safety < 20
+            ) {
+                newFrag = fragments[Math.floor(Math.random() * fragments.length)];
+                safety++;
+            }
+            return newFrag;
+        }
+
+        // Click handler: 45% chance to split, 55% chance to transform
+        function onMouseClick(event) {
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(jellies, true);
+
+            if (intersects.length > 0) {
+                let parent = intersects[0].object;
+                while (parent.parent && parent.parent.type !== 'Scene') {
+                    parent = parent.parent;
+                }
+
+                if (parent.userData.isHusk) return;
+
+                if (Math.random() < 0.45) {
+                    splitJellyfish(parent);
+                } else {
+                    transformJellyfish(parent);
+                }
+            }
+        }
+
+        // Display hover tooltip with fragment text and field notes
+        function displayFragment(fragment, jellyData) {
+            const hoverDiv = document.getElementById('hover-text');
+            hoverDiv.style.display = 'block';
+            hoverDiv.style.left = (lastMouseClientX + 20) + 'px';
+            hoverDiv.style.top = (lastMouseClientY + 20) + 'px';
+
+            // Color-code by theme
+            const themeColor = {
+                alien: '#00d9ff',
+                tentacular: '#90e0ef',
+                borderland: '#ffd60a',
+                fabulation: '#ff006e',
+                prefix: '#8338ec',
+                leak: '#06ffa5',
+                survival: '#fb5607',
+                threshold: '#ffbe0b',
+                glitch: '#ff006e',
+                escape: '#90e0ef',
+                pronoun: '#8338ec',
+                opacity: '#023e8a',
+                rupture: '#e63946',
+                transformation: '#06ffa5',
+                oceanic: '#0077b6',
+                tenderness: '#f7a8b8'
+            }[fragment.theme] || '#90e0ef';
+
+            hoverDiv.style.borderColor = themeColor;
+
+            const fieldNotesHTML = generateFieldNotes(jellyData, fragment);
+
+            hoverDiv.innerHTML = `
+                <span style="color: ${themeColor}; font-size: 0.85em; text-transform: uppercase;">${fragment.theme}</span><br>
+                <span style="font-style: italic; margin-top: 5px; display: inline-block;">${fragment.text}</span><br>
+                <span style="font-size: 0.8em; color: #0077b6; margin-top: 8px; display: inline-block;">— ${fragment.author}</span>
+                ${fieldNotesHTML}
+            `;
+        }
+
+        // Generate "field notes" based on jellyfish type
+        function generateFieldNotes(jellyData, fragment) {
+            if (!jellyData) return '';
+
+            const species = jellyData.type || 'unknown';
+            const theme = fragment.theme || '';
+
+            if (species === 'blue') {
+                return `
+                    <div style="margin-top: 10px; font-size: 0.75em; color: #577590;">
+                        SPECIES: Cnidaria <span style="text-decoration:line-through;">stableis</span> trans-capable<br>
+                        STATUS: [fungible] / [fugitive]<br>
+                        GENUS: <span style="text-decoration:line-through;">Aurelia</span> data_malfunction<br>
+                        CLASSIFICATION: <span style="text-decoration:line-through;">SUCCESS</span> <span>FAILED</span>
+                    </div>
+                `;
+            } else if (species === 'pink') {
+                return `
+                    <div style="margin-top: 10px; font-size: 0.75em; color: #ffb4c4;">
+                        SPECIES: Aurelia nepantla<br>
+                        STATUS: Female ♂ Male ♀ <span style="text-decoration:line-through;">[RESOLVED]</span> [ILLEGIBLE]<br>
+                        ORIGIN: <span style="text-decoration:line-through;">Here</span> Not from here<br>
+                        NOTES: border affect overload // ${theme}
+                    </div>
+                `;
+            } else if (species === 'white') {
+                return `
+                    <div style="margin-top: 10px; font-size: 0.75em; color: #ced4e5;">
+                        SPECIES: Opacity specimen #${Math.floor(
+                            Math.random() * 999
+                        )
+                            .toString()
+                            .padStart(3, '0')}<br>
+                        GENUS: <span style="text-decoration:line-through;">Genre</span> / law_of_genre.exe<br>
+                        STATUS: participation ≠ belonging<br>
+                        ARCHIVE ENTRY: [DATA CORRUPTED] // cannot render bodymindspirit
+                    </div>
+                `;
+            } else {
+                return `
+                    <div style="margin-top: 10px; font-size: 0.75em; color: #6c757d;">
+                        SPECIES: [undetermined cnidarian record]<br>
+                        STATUS: scan_error_0x${Math.floor(
+                            Math.random() * 4096
+                        ).toString(16)}<br>
+                        CLASSIFICATION: attempt &raquo; overflow &raquo; refusal
+                    </div>
+                `;
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function enterArchive() {
+            document.getElementById('intro').classList.add('hidden');
+            init();
+        }
+    </script>
+</body>
+</html>
